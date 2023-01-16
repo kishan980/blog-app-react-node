@@ -4,7 +4,9 @@ import {
   SET_TOKEN,
   REGISTER_ERRORS,
   LOGOUT,
-  LOGIN_ERRORS
+  LOGIN_ERRORS,
+  REDIRECT_TRUE,
+  REDIRECT_FALSE
 } from "../types/UserTypes";
 
 import jwt_decode from "jwt-decode";
@@ -21,6 +23,7 @@ const verifyToken = (token) => {
   const expiresIn = new Date(decodeToken.exp * 1000);
   if (new Date() > expiresIn) {
     localStorage.removeItem("myToken");
+    return null;
   } else {
     return decodeToken;
   }
@@ -71,7 +74,7 @@ const AuthReducer = (state = initState, action) => {
       ...state,
       loginErrors: action.payload
     } 
-  }
+  } 
   else {
     return state;
   }

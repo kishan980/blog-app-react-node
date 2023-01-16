@@ -1,12 +1,19 @@
 import { Helmet } from "react-helmet";
-import { useState } from "react";
+import { useState , useEffect} from "react";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
-
-
-const Create = () => {
+import { createAction } from "../store/asyncMethod/PostMethods";
+import { useSelector, useDispatch } from 'react-redux';
+import toast, { Toaster } from 'react-hot-toast';
+const Create = (props) => {
+  const {createErrors, redirect} = useSelector(state=>state.PostReducer)
+  console.log("🚀 ~ file: Create.js:10 ~ Create ~ createErrors", createErrors)
   const [currentImage, setCurrentImage] = useState("Choose image");
   const [imagePreview, setImagePreview] = useState("");
+  const dispatch = useDispatch()
+  const {user: {_id,name}} = useSelector(state =>state.AuthReducer);
+//   console.log("🚀 ~ file: Create.js:13 ~ Create ~ id,name", _id,name)
+//   const {_id,name}=user;
   const [value, setValue] = useState("");
   const [slug, setSlug] = useState("");
   const [slugButton, setSlugButton] = useState(false);
@@ -34,17 +41,20 @@ const Create = () => {
     setSlugButton(true);
   };
   const fileHandle = (e) => {
-    setCurrentImage(e.target.files[0].name);
-    setState({
-        ...state,
-        [e.target.name]:e.target.files[0]
+    if(e.target.files.length !==0){
 
-    })
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setImagePreview(reader.result);
-    };
-    reader.readAsDataURL(e.target.files[0]);
+      setCurrentImage(e.target.files[0].name);
+      setState({
+          ...state,
+          [e.target.name]:e.target.files[0]
+  
+      })
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result);
+      };
+      reader.readAsDataURL(e.target.files[0]);
+    }
   };
 
   const handleUrl = (e) => {
@@ -54,8 +64,28 @@ const Create = () => {
 
   const createPost = (e)=>{
     e.preventDefault()
-    console.log(state)
+    const {title, description, image}=state;
+    const formData = new FormData()
+    formData.append('title',title)
+    formData.append('body', value)
+    formData.append('image', image)
+    formData.append('description', description)
+    formData.append('slug', slug)
+    formData.append('name', name)
+    formData.append('id',_id)
+    dispatch(createAction(formData))
   }
+
+  useEffect(()=>{
+    if(redirect){
+      props.history.push("/dashboard")
+    }
+    if(createErrors.length >0){ 
+        createErrors.map((error) =>{
+         toast.error(error.msg)
+        })
+    }
+  },[createErrors,redirect])
   return (
     <div className="create mt-100">
       <Helmet>
@@ -69,6 +99,11 @@ const Create = () => {
             <div className="col-6 p-15">
               <div className="card">
                 <h3 className="card__h3">create a new post</h3>
+                <Toaster
+                position="top-right"
+                reverseOrder={true}
+                toastOptions={{style:{fontSize:"14px"}}}
+                />
                 <div className="group">
                   <label htmlFor="title">Post title</label>
                   <input
@@ -104,12 +139,24 @@ const Create = () => {
                   />
                 </div>
                 <div className="group">
-                  <input
-                    type="submit"
-                    value="Create post"
-                    className="btn btn-default btn-block"
-                  />
-                </div>
+                <label htmlFor="description">meta description</label>
+                <textarea
+                  name="description"
+                  id="description"
+                  cols="30"
+                  rows="10"
+                  placeholder="meta description..."
+                  className="group__control"
+                  maxLength="150"
+                  defaultValue={state.description}
+                  onChange={handleDescription}
+                ></textarea>
+               <p className="length">
+               {
+                  state.description ? state.description.length:0
+                }
+               </p>
+              </div>
               </div>
             </div>
             <div className="col-6 p-15">
@@ -140,25 +187,14 @@ const Create = () => {
                     {imagePreview ? <img src={imagePreview} alt="done" /> : ""}
                   </div>
                 </div>
+
                 <div className="group">
-                  <label htmlFor="description">meta description</label>
-                  <textarea
-                    name="description"
-                    id="description"
-                    cols="30"
-                    rows="10"
-                    placeholder="meta description..."
-                    className="group__control"
-                    maxLength="150"
-                    defaultValue={state.description}
-                    onChange={handleDescription}
-                  ></textarea>
-                 <p className="length">
-                 {
-                    state.description ? state.description.length:0
-                  }
-                 </p>
-                </div>
+                <input
+                  type="submit"
+                  value="Create post"
+                  className="btn btn-default btn-block"
+                />
+              </div>
               </div>
             </div>
           </div>
