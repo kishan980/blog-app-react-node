@@ -6,7 +6,7 @@ import {
   LOGOUT,
   LOGIN_ERRORS,
   REDIRECT_TRUE,
-  REDIRECT_FALSE
+  REDIRECT_FALSE,
 } from "../types/UserTypes";
 
 import jwt_decode from "jwt-decode";
@@ -32,9 +32,12 @@ const verifyToken = (token) => {
 const token = localStorage.getItem("myToken");
 if (token) {
   const decode = verifyToken(token);
-  initState.token = token;
-  const { user } = decode;
-  initState.user = user;
+  if(decode){
+
+    initState.token = token;
+    const { user } = decode;
+    initState.user = user;
+  }
 }
 
 const AuthReducer = (state = initState, action) => {
@@ -60,8 +63,8 @@ const AuthReducer = (state = initState, action) => {
       ...state,
       token: action.payload,
       user: user,
-      registerError:[],
-      loginErrors:[]
+      registerError: [],
+      loginErrors: [],
     };
   } else if (action.type === LOGOUT) {
     return {
@@ -69,13 +72,12 @@ const AuthReducer = (state = initState, action) => {
       token: "",
       user: "",
     };
-  } else if(action.type === LOGIN_ERRORS){
+  } else if (action.type === LOGIN_ERRORS) {
     return {
       ...state,
-      loginErrors: action.payload
-    } 
-  } 
-  else {
+      loginErrors: action.payload,
+    };
+  } else {
     return state;
   }
 };

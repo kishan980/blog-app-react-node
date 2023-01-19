@@ -1,33 +1,32 @@
 import { Helmet } from "react-helmet";
-import { useState , useEffect} from "react";
+import { useState, useEffect } from "react";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import { createAction } from "../store/asyncMethod/PostMethods";
-import { useSelector, useDispatch } from 'react-redux';
-import toast, { Toaster } from 'react-hot-toast';
+import { useSelector, useDispatch } from "react-redux";
+import toast, { Toaster } from "react-hot-toast";
 const Create = (props) => {
-  const {createErrors, redirect} = useSelector(state=>state.PostReducer)
-  console.log("🚀 ~ file: Create.js:10 ~ Create ~ createErrors", createErrors)
+  const { createErrors, redirect } = useSelector((state) => state.PostReducer);
   const [currentImage, setCurrentImage] = useState("Choose image");
   const [imagePreview, setImagePreview] = useState("");
-  const dispatch = useDispatch()
-  const {user: {_id,name}} = useSelector(state =>state.AuthReducer);
-//   console.log("🚀 ~ file: Create.js:13 ~ Create ~ id,name", _id,name)
-//   const {_id,name}=user;
+  const dispatch = useDispatch();
+  const {
+    user: { _id, name },
+  } = useSelector((state) => state.AuthReducer);
   const [value, setValue] = useState("");
   const [slug, setSlug] = useState("");
   const [slugButton, setSlugButton] = useState(false);
   const [state, setState] = useState({
     title: "",
     description: "",
-    image:""
+    image: "",
   });
-  const handleDescription = (e) =>{
-        setState({
-            ...state,
-           [e.target.name]:e.target.value
-        })
-  }
+  const handleDescription = (e) => {
+    setState({
+      ...state,
+      [e.target.name]: e.target.value,
+    });
+  };
   const handleInput = (e) => {
     setState({
       ...state,
@@ -41,14 +40,12 @@ const Create = (props) => {
     setSlugButton(true);
   };
   const fileHandle = (e) => {
-    if(e.target.files.length !==0){
-
+    if (e.target.files.length !== 0) {
       setCurrentImage(e.target.files[0].name);
       setState({
-          ...state,
-          [e.target.name]:e.target.files[0]
-  
-      })
+        ...state,
+        [e.target.name]: e.target.files[0],
+      });
       const reader = new FileReader();
       reader.onloadend = () => {
         setImagePreview(reader.result);
@@ -62,34 +59,34 @@ const Create = (props) => {
     setSlug(slug.trim().split(" ").join("-"));
   };
 
-  const createPost = (e)=>{
-    e.preventDefault()
-    const {title, description, image}=state;
-    const formData = new FormData()
-    formData.append('title',title)
-    formData.append('body', value)
-    formData.append('image', image)
-    formData.append('description', description)
-    formData.append('slug', slug)
-    formData.append('name', name)
-    formData.append('id',_id)
-    dispatch(createAction(formData))
-  }
+  const createPost = (e) => {
+    e.preventDefault();
+    const { title, description, image } = state;
+    const formData = new FormData();
+    formData.append("title", title);
+    formData.append("body", value);
+    formData.append("image", image);
+    formData.append("description", description);
+    formData.append("slug", slug);
+    formData.append("name", name);
+    formData.append("id", _id);
+    dispatch(createAction(formData));
+  };
 
-  useEffect(()=>{
-    if(redirect){
-      props.history.push("/dashboard")
+  useEffect(() => {
+    if (redirect) {
+      props.history.push("/dashboard");
     }
-    if(createErrors.length >0){ 
-        createErrors.map((error) =>{
-         toast.error(error.msg)
-        })
+    if (createErrors.length > 0) {
+      createErrors.map((error) => {
+        toast.error(error.msg);
+      });
     }
-  },[createErrors,redirect])
+  }, [createErrors, redirect]);
   return (
     <div className="create mt-100">
       <Helmet>
-        <title>crate new Post</title>
+        <title>create new Post</title>
         <meta name="description" content="create a new post" />
       </Helmet>
 
@@ -100,9 +97,9 @@ const Create = (props) => {
               <div className="card">
                 <h3 className="card__h3">create a new post</h3>
                 <Toaster
-                position="top-right"
-                reverseOrder={true}
-                toastOptions={{style:{fontSize:"14px"}}}
+                  position="top-right"
+                  reverseOrder={true}
+                  toastOptions={{ style: { fontSize: "14px" } }}
                 />
                 <div className="group">
                   <label htmlFor="title">Post title</label>
@@ -124,7 +121,6 @@ const Create = (props) => {
                     type="file"
                     name="image"
                     id="image"
-                    placeholder="Enter title..."
                     onChange={fileHandle}
                   />
                 </div>
@@ -139,24 +135,22 @@ const Create = (props) => {
                   />
                 </div>
                 <div className="group">
-                <label htmlFor="description">meta description</label>
-                <textarea
-                  name="description"
-                  id="description"
-                  cols="30"
-                  rows="10"
-                  placeholder="meta description..."
-                  className="group__control"
-                  maxLength="150"
-                  defaultValue={state.description}
-                  onChange={handleDescription}
-                ></textarea>
-               <p className="length">
-               {
-                  state.description ? state.description.length:0
-                }
-               </p>
-              </div>
+                  <label htmlFor="description">meta description</label>
+                  <textarea
+                    name="description"
+                    id="description"
+                    cols="30"
+                    rows="10"
+                    placeholder="meta description..."
+                    className="group__control"
+                    maxLength="150"
+                    defaultValue={state.description}
+                    onChange={handleDescription}
+                  ></textarea>
+                  <p className="length">
+                    {state.description ? state.description.length : 0}
+                  </p>
+                </div>
               </div>
             </div>
             <div className="col-6 p-15">
@@ -189,12 +183,12 @@ const Create = (props) => {
                 </div>
 
                 <div className="group">
-                <input
-                  type="submit"
-                  value="Create post"
-                  className="btn btn-default btn-block"
-                />
-              </div>
+                  <input
+                    type="submit"
+                    value="Create post"
+                    className="btn btn-default btn-block"
+                  />
+                </div>
               </div>
             </div>
           </div>

@@ -12,6 +12,10 @@ import Store from "./store/index";
 import Dashboard from './components/Dashboard';
 import NotFound from './components/NotFound';
 import Create from './components/Create';
+import Edit from './components/Edit';
+import EditImage from './components/EditImage';
+import UpdateName from './components/UpdateName';
+import ChangePassword from './components/ChangePassword';
 
 function App() {
   return (
@@ -22,8 +26,12 @@ function App() {
     <Route path="/"  exact component={Home}/>
     <RoutesLink path="/register" exact component={Register}/>
     <RoutesLink path="/login" exact component={Login}/>
-    <PrivateRoute path="/dashboard" exact component={Dashboard}/>
+    <PrivateRoute path="/dashboard/:page?" exact component={Dashboard}/>
     <PrivateRoute path="/create" exact component={Create}/>
+    <PrivateRoute path="/edit/:id" exact  component={Edit}/>
+    <PrivateRoute path="/updateImage/:id" exact component={EditImage}/>
+    <PrivateRoute path="/update-name" exact component={UpdateName}/>
+    <PrivateRoute path="/change-password" exact component={ChangePassword}/>
     <Route component={NotFound}/>
     </Switch>
     </Router>
