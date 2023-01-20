@@ -1,5 +1,5 @@
 import axios from "axios";
-import { CLOSE_LOADER } from "../types/PostTypes";
+import { CLOSE_LOADER, SET_UPDATE_ERRORS } from "../types/PostTypes";
 import { SET_LOADER, SET_TOKEN } from "./../types/UserTypes";
 import {
   REDIRECT_TRUE,
@@ -50,10 +50,13 @@ export const updatePasswordAction = (userData) =>{
     };
     dispatch({type: SET_LOADER})
     try{
-        const {data} =await axios.post("");
-        
+        const {data} =await axios.post("/updatePassword", userData, config);  
+        dispatch({type:CLOSE_LOADER})
+        dispatch({type:SET_MESSAGE, payload:data.msg})
+        dispatch({type:REDIRECT_TRUE})
     }catch(error){
       dispatch({type:CLOSE_LOADER})
+      dispatch({type:SET_PROFILE_ERROR, payload:error.response.data.errors})
     }
   }
 }

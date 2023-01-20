@@ -1,24 +1,30 @@
 import { Helmet } from "react-helmet";
 import { useEffect, useState } from "react";
-import { useParams,useHistory } from "react-router-dom";
+import { useParams, useHistory } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { updateImageAction } from "../store/asyncMethod/PostMethods";
 import toast, { Toaster } from "react-hot-toast";
 import { RESET_UPDATE_IMAGE_ERRORS } from "../store/types/PostTypes";
-
-
+import { getById } from './../store/asyncMethod/PostMethods';
 
 const EditImage = () => {
   const { id } = useParams();
   const dispatch = useDispatch();
-  const history=useHistory();
+  const history = useHistory();
   const { updateImageErrors } = useSelector((state) => state.UpdateImage);
-  const {redirect}= useSelector(state=>state.PostReducer)
+  const { redirect } = useSelector((state) => state.PostReducer);
+  const { post} = useSelector((state) => state.getByIdPost);
+  console.log("🚀 ~ file: EditImage.js:17 ~ EditImage ~ post", post.image)
+
+
+
   const [state, setState] = useState({
     image: "",
     imagePreview: "",
     imageName: "ChooseImage",
+    oldImage: "",
   });
+  const [OldImg,setOldImg] = useState('')
   const fileHandle = (e) => {
     if (e.target.files.length[0] !== 0) {
       const reader = new FileReader();
@@ -43,14 +49,28 @@ const EditImage = () => {
   useEffect(() => {
     if (updateImageErrors.length !== 0) {
       updateImageErrors.map((error) => toast.error(error.msg));
-      dispatch({type:RESET_UPDATE_IMAGE_ERRORS})
+      dispatch({ type: RESET_UPDATE_IMAGE_ERRORS });
     }
   }, [updateImageErrors]);
-  useEffect(() =>{
-    if(redirect){
-        history.push("/dashboard")
+  useEffect(() => {
+    if (redirect) {
+      history.push("/dashboard");
     }
-  },[redirect])
+  }, [redirect]);
+
+  useEffect(() => {
+    dispatch(getById(id));
+    if(post){
+      setOldImg(post.image)
+      // setState({
+      //   ...state,
+      //   oldImage:post.image
+      // })
+    }
+  }, [id]);
+
+  
+
   return (
     <>
       <Helmet>
@@ -87,7 +107,11 @@ const EditImage = () => {
                 </div>
                 <div className="group">
                   <div className="imagePreview">
-                    {state.imagePreview ? <img src={state.imagePreview} /> : ""}
+                    {state.imagePreview ? (
+                      <img src={state.imagePreview} />
+                    ) : (
+                      <img src={`/images/${OldImg}`} alt={state.oldImage} />
+                    )}
                   </div>
                 </div>
 

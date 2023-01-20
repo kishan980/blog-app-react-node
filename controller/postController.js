@@ -4,7 +4,8 @@ const { v4: uuidv4 } = require("uuid");
 const { htmlToText } = require("html-to-text");
 const { body, validationResult } = require("express-validator");
 const fs = require("fs");
-const jwt = require("jsonwebtoken")
+const jwt = require("jsonwebtoken");
+const bcrypt = require("bcrypt");
 
 module.exports.createPost = (req, res) => {
   const form = formidable({ multiples: true });
@@ -184,24 +185,97 @@ module.exports.deletePost = async (req, res) => {
 };
 
 const UserModel = require("../models/User");
-module.exports.profileUpdate = async(req,res) =>{
-    const {name, id} = req.body;
-    console.log(name)
-   if(name ===''){
-    return res.status(400).send({errors: [{msg:"Name is required"}]})
-   } else {
-    try{
-      const user = await UserModel.findOneAndUpdate(id, {name:name},{new:true });
-      const token =jwt.sign({user}, process.env.SECRET,{
-        expiresIn:'1d'
-      })
-      return res.status(200).send({msg:"Your Name is updated...",token})
-    }catch(error){
-    return res.status(500).send({ errors: error, msg: error.message });
+module.exports.profileUpdate = async (req, res) => {
+  const { name, id } = req.body;
+  console.log(name);
+  if (name === "") {
+    return res.status(400).send({ errors: [{ msg: "Name is required" }] });
+  } else {
+    try {
+      const user = await UserModel.findOneAndUpdate(
+        id,
+        { name: name },
+        { new: true }
+      );
+      const token = jwt.sign({ user }, process.env.SECRET, {
+        expiresIn: "1d",
+      });
+      return res.status(200).send({ msg: "Your Name is updated...", token });
+    } catch (error) {
+      return res.status(500).send({ errors: error, msg: error.message });
     }
-   }
-}
+  }
+};
 
-module.exports.updatePassword = (req, res) =>{
+module.exports.ChangePasswordValidation = [
+  body("currentPassword")
+    .not()
+    .isEmpty()
+    .trim()
+    .withMessage("Please enter the old password"),
+  body("newPassword")
+    .isLength({ min: 6 })
+    .withMessage("Please new password must be 6 character log"),
+];
+module.exports.updatePassword = async (req, res) => {
+  const { currentPassword, newPassword, userId } = req.body;
+  const errors = validationResult(req);
+  try {
+    if (!errors.isEmpty()) {
+      return res.status(400).send({ errors: errors.array() });
+    } else {
+      const user = await UserModel.findOne({ _id: userId });
+      if (user) {
+        const matchPassword = await bcrypt.compare(
+          currentPassword,
+          user.password
+        );
+        if (!matchPassword) {
+          return res
+            .status(404)
+            .send({ errors: [{ msg: "current password is wrong" }] });
+        } else {
+          const salt = await bcrypt.genSalt(10);
+          const hash = await bcrypt.hash(newPassword, salt);
+          const updatePassword = await UserModel.findOneAndUpdate(
+            { _id: userId },
+            { password: hash, updatedAt: new Date() },
+            { new: true }
+          );
+          return res
+            .status(200)
+            .send({ msg: "Your password has been updated" });
+        }
+      }
+    }
+  } catch (error) {
+    return res.status(500).send({ errors: error, msg: error.message });
+  }
+};
 
-}
+module.exports.home = async (req, res) => {
+  const page = req.params.page;
+  const perPage = 10;
+  const skip = (page - 1) * perPage;
+  try {
+    const count = await PostModel.find({}).countDocuments();
+    const posts = await PostModel.find({})
+      .skip(skip)
+      .limit(perPage)
+      .sort({ updatedAt: -1 });
+
+    return res.status(200).send({ response: posts, count, perPage });
+  } catch (error) {
+    return res.status(500).send({ errors: error, msg: error.message });
+  }
+};
+
+module.exports.details = async (req, res) => {
+  const id = req.params.id;
+  try {
+    const post = await PostModel.findOne({ _id: id });
+      return res.status(200).send({ post });
+  } catch (error) {
+    return res.status(500).send({ errors: error, msg: error.message });
+  }
+};

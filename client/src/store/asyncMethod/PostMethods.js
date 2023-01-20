@@ -11,6 +11,7 @@ import {
   POST_REQUEST,
   SET_UPDATE_ERRORS,
   UPDATE_IMAGE_ERROR,
+  SET_DETAILS
 } from "../types/PostTypes";
 // const token = localStorage.getItem("myToken");
 
@@ -149,3 +150,45 @@ export const updateImageAction = (updateData) => {
     }
   };
 };
+
+export const HomePosts = (page) => {
+  return async (dispatch, getState) => {
+    const {
+      AuthReducer: { token },
+    } = getState();
+
+    const config = {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    };
+    dispatch({ type: SET_LOADER });
+    try {
+      const {
+        data: { response, count, perPage },
+      } = await axios.get(`/home/${page}`, config);
+      dispatch({ type: CLOSE_LOADER });
+      dispatch({ type: SET_POSTS, payload: { response, count, perPage } });
+    } catch (error) {
+      dispatch({ type: CLOSE_LOADER });
+      console.log(error);
+    }
+  };
+};
+
+
+export const postDetails = (id) => {
+  console.log("🚀 ~ file: PostMethods.js:181 ~ postDetails ~ id", id)
+
+  return async(dispatch) =>{
+    dispatch({type:SET_LOADER})
+    try{
+      const {data:{post}} = await axios.get(`/details/${id}`);
+      dispatch({type: CLOSE_LOADER})
+      dispatch({type:SET_DETAILS, payload:post})
+    }catch(error){
+      dispatch({type: CLOSE_LOADER})
+      console.log(error)
+    }
+  }
+} 

@@ -11,7 +11,8 @@ const rootReducers = combineReducers({
   getByIdPost,
   UpdatePost,
   UpdateImage,
-  updateNameProfile
+  updateNameProfile,
+  
 });
 const middleWares = [thunkMiddleware];
 const Store = createStore(
