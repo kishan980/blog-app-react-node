@@ -85,7 +85,7 @@ export const getById = (id) => {
       dispatch({ type: POST_REQUEST });
     } catch (error) {
       dispatch({ type: CLOSE_LOADER });
-      console.log(error.message);
+
     }
   };
 };
@@ -115,7 +115,7 @@ export const updateAction = (editData) => {
       } = error;
       dispatch({ type: CLOSE_LOADER });
       dispatch({ type: SET_UPDATE_ERRORS, payload: errors });
-      console.log(error.response);
+     
     }
   };
 };
@@ -171,14 +171,13 @@ export const HomePosts = (page) => {
       dispatch({ type: SET_POSTS, payload: { response, count, perPage } });
     } catch (error) {
       dispatch({ type: CLOSE_LOADER });
-      console.log(error);
+      
     }
   };
 };
 
 
 export const postDetails = (id) => {
-  console.log("🚀 ~ file: PostMethods.js:181 ~ postDetails ~ id", id)
 
   return async(dispatch) =>{
     dispatch({type:SET_LOADER})
@@ -188,7 +187,7 @@ export const postDetails = (id) => {
       dispatch({type:SET_DETAILS, payload:post})
     }catch(error){
       dispatch({type: CLOSE_LOADER})
-      console.log(error)
+    
     }
   }
 } 

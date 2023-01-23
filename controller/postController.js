@@ -27,7 +27,7 @@ module.exports.createPost = (req, res) => {
     if (Object.keys(files).length === 0) {
       errors.push({ msg: "Image is required" });
     } else {
-      console.log(files);
+      
       const { mimetype } = files.image;
       const split = mimetype.split("/");
       const extension = split[1].toLowerCase();
@@ -187,7 +187,7 @@ module.exports.deletePost = async (req, res) => {
 const UserModel = require("../models/User");
 module.exports.profileUpdate = async (req, res) => {
   const { name, id } = req.body;
-  console.log(name);
+
   if (name === "") {
     return res.status(400).send({ errors: [{ msg: "Name is required" }] });
   } else {

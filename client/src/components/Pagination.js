@@ -1,14 +1,13 @@
-import { Link,useNavigate } from "react-router-dom";
+import { Link,useHistory } from "react-router-dom";
 import { BsChevronDoubleRight, BsChevronDoubleLeft } from "react-icons/bs";
 import { useEffect } from 'react';
 const Pagination = ({ count, perPage, page, path }) => {
-  console.log("🚀 ~ file: Pagination.js:5 ~ Pagination ~ page", page)
-  // const navigate = useNavigate()
+  const history = useHistory()
+
   if (page === undefined) {
    page = 1;
   }
   let totalPages = Math.ceil(count / perPage);
-  console.log("🚀 ~ file: Pagination.js:10 ~ Pagination ~ totalPages", totalPages)
   let startLoop = parseInt(page);
   let diff = totalPages - parseInt(page);
   if (diff <= 3) {
@@ -54,8 +53,8 @@ const Pagination = ({ count, perPage, page, path }) => {
     }
   };
   // useEffect(()=>{
-  //   if(totalPages !== page){
-  //     navigate(`/${path}/${totalPages}`)
+  //   if(totalPages !== parseInt(page)){
+  //     history.push(`/${path}/${totalPages}`)
   //   }
   // },[totalPages]);
   return totalPages && count >10?  (

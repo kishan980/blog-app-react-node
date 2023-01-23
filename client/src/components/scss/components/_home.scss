@@ -68,4 +68,11 @@
             object-fit:cover;
         }
     }
+    &__details{
+        background:$white;
+        padding: 2rem;
+        border-radius: 4px;
+        border:1px solid #e5e7eb;
+        justify-content: center;
+    }
 }

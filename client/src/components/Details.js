@@ -7,9 +7,7 @@ import moment from "moment";
 
 const Details = () => {
     const {id} =useParams();
-    console.log("🚀 ~ file: Details.js:10 ~ Details ~ id", id)
     const {loading, details} = useSelector(state=>state.PostReducer)
-    // console.log("🚀 ~ file: Details.js:11 ~ Details ~ details", details)
     const dispatch = useDispatch();
 
     useEffect(() =>{
@@ -32,6 +30,12 @@ const Details = () => {
                                 <span>{moment(details.updatedAt).format("MMM Do YY")}</span>
                             </div>
                     </div>
+                    <div className="post__body">
+                    <h1 className="post__body_title">{details.title}</h1>
+                </div>
+                <div className="post__body__details">
+                  {details.body}
+                </div>
             </div>
             :
             <Loader/>
